@@ -1,0 +1,346 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>قاموس درس في البيت</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Segoe UI',Tahoma,Arial,sans-serif;background:linear-gradient(135deg,#e0f7f4 0%,#f0fdf9 50%,#e8f8f5 100%);min-height:100vh;direction:rtl}
+
+.hero{background:linear-gradient(135deg,#1a9e87,#2dc7a8,#3dd6b5);padding:32px 24px 28px;text-align:center;position:relative;overflow:hidden}
+.hero::before{content:'';position:absolute;top:-30px;left:-30px;width:120px;height:120px;border-radius:50%;background:rgba(255,255,255,.1)}
+.hero::after{content:'';position:absolute;bottom:-20px;right:-20px;width:80px;height:80px;border-radius:50%;background:rgba(255,255,255,.08)}
+.hero-icon{font-size:48px;margin-bottom:10px;display:block}
+.hero h1{color:#fff;font-size:26px;font-weight:700;margin-bottom:6px;text-shadow:0 2px 8px rgba(0,0,0,.15)}
+.hero p{color:rgba(255,255,255,.88);font-size:14px;margin-bottom:16px}
+.audio-test-btn{background:rgba(255,255,255,.2);color:#fff;border:1.5px solid rgba(255,255,255,.5);padding:8px 22px;border-radius:50px;font-size:14px;cursor:pointer;backdrop-filter:blur(4px);transition:all .2s;font-family:inherit}
+.audio-test-btn:hover{background:rgba(255,255,255,.35)}
+
+.controls{padding:16px 20px;background:#fff;border-bottom:1px solid #e0f5f1;position:sticky;top:0;z-index:100;box-shadow:0 2px 12px rgba(26,158,135,.08)}
+.search-wrap{position:relative;margin-bottom:12px}
+.search-wrap input{width:100%;padding:10px 44px 10px 16px;border:1.5px solid #b2e8df;border-radius:50px;font-size:14px;outline:none;background:#f7fffe;color:#1a3a35;transition:border .2s;font-family:inherit;direction:rtl}
+.search-wrap input:focus{border-color:#1a9e87;background:#fff}
+.search-icon{position:absolute;right:14px;top:50%;transform:translateY(-50%);font-size:18px;color:#1a9e87}
+.count{text-align:center;font-size:12px;color:#5aab9c;margin-bottom:10px}
+
+.filter-row{display:flex;gap:8px;flex-wrap:wrap;justify-content:center}
+.ftag{padding:6px 16px;border-radius:50px;border:1.5px solid #b2e8df;background:#f0fdf9;color:#2a7a6e;cursor:pointer;font-size:13px;font-weight:500;transition:all .2s;white-space:nowrap;font-family:inherit}
+.ftag:hover{border-color:#1a9e87;background:#e0f7f4}
+.ftag.active{background:linear-gradient(135deg,#1a9e87,#2dc7a8);color:#fff;border-color:transparent;box-shadow:0 3px 10px rgba(26,158,135,.3)}
+
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(170px,1fr));gap:14px;padding:20px}
+
+.card{background:#fff;border-radius:18px;border:1.5px solid #d4f0ea;padding:18px 14px 14px;text-align:center;cursor:pointer;transition:all .22s;position:relative;box-shadow:0 2px 8px rgba(26,158,135,.06)}
+.card:hover{transform:translateY(-4px);box-shadow:0 8px 24px rgba(26,158,135,.18);border-color:#2dc7a8}
+.card.playing{border-color:#1a9e87;box-shadow:0 0 0 3px rgba(26,158,135,.2),0 8px 24px rgba(26,158,135,.18)}
+
+.card-icon{width:56px;height:56px;border-radius:50%;margin:0 auto 10px;display:flex;align-items:center;justify-content:center;font-size:28px;background:linear-gradient(135deg,#e0f7f4,#b2e8df)}
+.card-word{font-size:17px;font-weight:700;color:#1a3a35;margin-bottom:4px;line-height:1.4}
+.card-en{display:inline-block;padding:3px 12px;border-radius:50px;font-size:11px;font-weight:600;color:#fff;background:linear-gradient(135deg,#1a9e87,#2dc7a8);margin-bottom:8px}
+.card-ex{font-size:12px;color:#4a7a72;line-height:1.6;min-height:36px}
+.audio-btn{width:32px;height:32px;border-radius:50%;background:linear-gradient(135deg,#1a9e87,#2dc7a8);border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;margin:8px auto 0;transition:all .2s;box-shadow:0 2px 8px rgba(26,158,135,.3)}
+.audio-btn:hover{transform:scale(1.1);box-shadow:0 4px 14px rgba(26,158,135,.45)}
+.audio-btn svg{width:14px;height:14px;fill:#fff}
+.audio-btn.playing-anim{animation:pulse-ring .6s ease-in-out infinite}
+@keyframes pulse-ring{0%,100%{box-shadow:0 0 0 0 rgba(26,158,135,.5)}50%{box-shadow:0 0 0 8px rgba(26,158,135,0)}}
+
+.cat-badge{position:absolute;top:8px;left:8px;width:10px;height:10px;border-radius:50%}
+.cat-verb{background:#16a34a}
+.cat-noun{background:#ca8a04}
+.cat-prep{background:#f97316}
+.cat-question{background:#3b82f6}
+.cat-connect{background:#ec4899}
+
+.section-divider{grid-column:1/-1;display:flex;align-items:center;gap:10px;margin:6px 0 2px}
+.section-divider span{font-size:13px;font-weight:700;color:#1a9e87;white-space:nowrap}
+.section-divider::before,.section-divider::after{content:'';flex:1;height:1.5px;background:linear-gradient(to left,#d4f0ea,transparent)}
+.section-divider::after{background:linear-gradient(to right,#d4f0ea,transparent)}
+
+.no-results{grid-column:1/-1;text-align:center;padding:40px;color:#5aab9c;font-size:16px}
+
+.legend{padding:12px 20px;display:flex;flex-wrap:wrap;gap:8px;justify-content:center;border-bottom:1px solid #e0f5f1;background:#fff}
+.leg-item{display:flex;align-items:center;gap:5px;font-size:11px;color:#4a7a72}
+.leg-dot{width:9px;height:9px;border-radius:50%;flex-shrink:0}
+
+footer{text-align:center;padding:20px;font-size:12px;color:#5aab9c}
+
+/* Section backgrounds by category */
+.verb-section{background:linear-gradient(135deg,#f0fdf4,#dcfce7);border:1.5px solid #86efac}
+.verb-section .card-en{background:linear-gradient(135deg,#16a34a,#22c55e)}
+.noun-section{background:linear-gradient(135deg,#fefce8,#fef9c3);border:1.5px solid #fde047}
+.noun-section .card-en{background:linear-gradient(135deg,#ca8a04,#eab308)}
+.prep-section{background:linear-gradient(135deg,#fff7ed,#ffedd5);border:1.5px solid #fdba74}
+.prep-section .card-en{background:linear-gradient(135deg,#f97316,#fb923c)}
+.question-section{background:linear-gradient(135deg,#eff6ff,#dbeafe);border:1.5px solid #93c5fd}
+.question-section .card-en{background:linear-gradient(135deg,#3b82f6,#60a5fa)}
+.connect-section{background:linear-gradient(135deg,#fdf2f8,#fce7f3);border:1.5px solid #f9a8d4}
+.connect-section .card-en{background:linear-gradient(135deg,#ec4899,#f472b6)}
+</style>
+</head>
+<body>
+
+<div class="hero">
+  <span class="hero-icon">🏠</span>
+  <h1>قَامُوسُ دَرْسِ فِي الْبَيْتِ 🏠</h1>
+  <p>أَفْعَالٌ · أَسْمَاءُ الْبَيْتِ · حُرُوفُ الْجَرِّ · أَدَوَاتُ الِاسْتِفْهَامِ · أَدَوَاتُ الرَّبْطِ · اضغط على 🔊 لِسَمَاعِ الْكَلِمَةِ وَالْمِثَالِ</p>
+  <button class="audio-test-btn" onclick="testAudio()">🔊 اختبار الصوت</button>
+</div>
+
+<div class="controls">
+  <div class="search-wrap">
+    <span class="search-icon">🔍</span>
+    <input type="text" id="searchInput" placeholder="ابحث عن كلمة..." oninput="filterCards()">
+  </div>
+  <div class="count" id="countLabel">جميع الكلمات</div>
+  <div class="filter-row" id="filterRow"></div>
+</div>
+
+<div class="legend">
+  <div class="leg-item"><div class="leg-dot" style="background:#16a34a"></div>الأفعال</div>
+  <div class="leg-item"><div class="leg-dot" style="background:#ca8a04"></div>أسماء البيت</div>
+  <div class="leg-item"><div class="leg-dot" style="background:#f97316"></div>حروف الجر</div>
+  <div class="leg-item"><div class="leg-dot" style="background:#3b82f6"></div>أدوات الاستفهام</div>
+  <div class="leg-item"><div class="leg-dot" style="background:#ec4899"></div>أدوات الربط</div>
+</div>
+
+<div class="grid" id="cardsGrid"></div>
+
+<footer>🏠 قاموس درس في البيت · AE · 2026</footer>
+
+<script>
+const WORDS = [
+  // ===== الأفعال =====
+  {id:1, ar:'أَجْلِسُ', en:'Sit', ex:'أَنَا أَجْلِسُ عَلَى الْكُرْسِيِّ.', cat:'verb', icon:'🪑'},
+  {id:2, ar:'أَكْتُبُ', en:'Write', ex:'أَكْتُبُ الْوَاجِبَ فِي غُرْفَتِي.', cat:'verb', icon:'✍️'},
+  {id:3, ar:'أَقْرَأُ', en:'Read', ex:'أَقْرَأُ كِتَابًا مُمْتِعًا كُلَّ يَوْمٍ.', cat:'verb', icon:'📖'},
+  {id:4, ar:'أَدْرُسُ', en:'Study', ex:'أَدْرُسُ دُرُوسِي فِي غُرْفَةِ الْجُلُوسِ.', cat:'verb', icon:'📚'},
+  {id:5, ar:'آكُلُ', en:'Eat', ex:'آكُلُ الطَّعَامَ فِي غُرْفَةِ الطَّعَامِ.', cat:'verb', icon:'🍽️'},
+  {id:6, ar:'أَشْرَبُ', en:'Drink', ex:'أَشْرَبُ الْمَاءَ فِي الْمَطْبَخِ.', cat:'verb', icon:'🥤'},
+  {id:7, ar:'أُشَاهِدُ', en:'Watch', ex:'أُشَاهِدُ التِّلْفَازَ فِي غُرْفَةِ الْجُلُوسِ.', cat:'verb', icon:'📺'},
+
+  // ===== أسماء البيت =====
+  {id:10, ar:'بَيْت', en:'House', ex:'بَيْتِي كَبِيرٌ وَجَمِيلٌ.', cat:'noun', icon:'🏠'},
+  {id:11, ar:'غُرْفَة', en:'Room', ex:'غُرْفَتِي مُرَتَّبَةٌ دَائِمًا.', cat:'noun', icon:'🚪'},
+  {id:12, ar:'غُرْفَةُ الطَّعَامِ', en:'Dining room', ex:'نَأْكُلُ مَعًا فِي غُرْفَةِ الطَّعَامِ.', cat:'noun', icon:'🍴'},
+  {id:13, ar:'غُرْفَةُ الْجُلُوسِ', en:'Living room', ex:'نُشَاهِدُ التِّلْفَازَ فِي غُرْفَةِ الْجُلُوسِ.', cat:'noun', icon:'🛋️'},
+  {id:14, ar:'غُرْفَةُ النَّوْمِ', en:'Bedroom', ex:'أَنَامُ فِي غُرْفَةِ النَّوْمِ.', cat:'noun', icon:'🛏️'},
+  {id:15, ar:'حَمَّام', en:'Bathroom', ex:'أَغْسِلُ يَدَيَّ فِي الْحَمَّامِ.', cat:'noun', icon:'🛁'},
+  {id:16, ar:'مَطْبَخ', en:'Kitchen', ex:'تَطْبُخُ أُمِّي فِي الْمَطْبَخِ.', cat:'noun', icon:'🍳'},
+  {id:17, ar:'حَدِيقَة', en:'Garden', ex:'أَلْعَبُ فِي الْحَدِيقَةِ مَعَ أَصْدِقَائِي.', cat:'noun', icon:'🌳'},
+  {id:18, ar:'طَاوِلَة', en:'Table', ex:'الْكِتَابُ عَلَى الطَّاوِلَةِ.', cat:'noun', icon:'🍽️'},
+  {id:19, ar:'كُرْسِيّ', en:'Chair', ex:'أَجْلِسُ عَلَى الْكُرْسِيِّ.', cat:'noun', icon:'🪑'},
+
+  // ===== حروف الجر =====
+  {id:30, ar:'فِي', en:'In', ex:'الْقِطُّ فِي الْحَدِيقَةِ.', cat:'prep', icon:'📥'},
+  {id:31, ar:'مِنْ', en:'From', ex:'أَنَا مِنَ الْإِمَارَاتِ.', cat:'prep', icon:'📤'},
+  {id:32, ar:'إِلَى', en:'To', ex:'أَذْهَبُ إِلَى الْمَدْرَسَةِ صَبَاحًا.', cat:'prep', icon:'➡️'},
+  {id:33, ar:'عَلَى', en:'On', ex:'الْكِتَابُ عَلَى الطَّاوِلَةِ.', cat:'prep', icon:'⬆️'},
+  {id:34, ar:'عَنْ', en:'About', ex:'أَتَحَدَّثُ عَنْ بَيْتِي.', cat:'prep', icon:'💬'},
+
+  // ===== أدوات الاستفهام =====
+  {id:40, ar:'أَيْنَ', en:'Where', ex:'أَيْنَ الْكِتَابُ؟', cat:'question', icon:'📍'},
+  {id:41, ar:'مَاذَا', en:'What', ex:'مَاذَا تَأْكُلُ؟', cat:'question', icon:'❓'},
+  {id:42, ar:'مَا', en:'What', ex:'مَا اسْمُكَ؟', cat:'question', icon:'❔'},
+  {id:43, ar:'مَتَى', en:'When', ex:'مَتَى تَذْهَبُ إِلَى الْمَدْرَسَةِ؟', cat:'question', icon:'⏰'},
+  {id:44, ar:'كَيْفَ', en:'How', ex:'كَيْفَ حَالُكَ؟', cat:'question', icon:'🤔'},
+  {id:45, ar:'مَنْ', en:'Who', ex:'مَنْ فِي الْغُرْفَةِ؟', cat:'question', icon:'👤'},
+  {id:46, ar:'لِمَاذَا', en:'Why', ex:'لِمَاذَا أَنْتَ سَعِيدٌ؟', cat:'question', icon:'🧐'},
+  {id:47, ar:'هَلْ', en:'Do / Does', ex:'هَلْ تُحِبُّ الْقِرَاءَةَ؟', cat:'question', icon:'🔎'},
+
+  // ===== أدوات الربط =====
+  {id:50, ar:'وَ', en:'And', ex:'أَقْرَأُ وَأَكْتُبُ كُلَّ يَوْمٍ.', cat:'connect', icon:'➕'},
+  {id:51, ar:'ثُمَّ', en:'Then', ex:'أَدْرُسُ ثُمَّ أَلْعَبُ.', cat:'connect', icon:'🔁'},
+  {id:52, ar:'بَيْنَمَا', en:'While', ex:'أَقْرَأُ بَيْنَمَا أُمِّي تَطْبُخُ.', cat:'connect', icon:'⏳'},
+  {id:53, ar:'أَيْضًا', en:'Also', ex:'أُحِبُّ الْقِرَاءَةَ، وَأُحِبُّ الرَّسْمَ أَيْضًا.', cat:'connect', icon:'🔂'},
+  {id:54, ar:'بَعْدَ ذَلِكَ', en:'After that', ex:'أَنْهَيْتُ الْوَاجِبَ، وَبَعْدَ ذَلِكَ لَعِبْتُ.', cat:'connect', icon:'⏭️'},
+];
+
+const CATS = {
+  all:     {label:'🔮 الكل', cls:''},
+  verb:    {label:'🟢 الأفعال', cls:'verb-section'},
+  noun:    {label:'🟡 أسماء البيت', cls:'noun-section'},
+  prep:    {label:'🟠 حروف الجر', cls:'prep-section'},
+  question:{label:'🔵 أدوات الاستفهام', cls:'question-section'},
+  connect: {label:'🩷 أدوات الربط', cls:'connect-section'},
+};
+
+let currentCat = 'all';
+let synth = window.speechSynthesis;
+let currentPlaying = null;
+let currentUtt = null;          // keep a reference so the browser does not garbage-collect it mid-speech
+let noVoiceWarned = false;
+
+// Names of common Arabic voices (male / female) across Edge, Windows, macOS/iOS, Android
+const MALE_HINTS   = ['hamdan','hamed','shakir','naayf','maged','majed','tarik','tariq','omar','salem','fahed','jamal','khalid','youssef','yousef','male','ذكر'];
+const FEMALE_HINTS = ['fatima','zariyah','hoda','salma','laila','layla','mariam','maryam','amal','noor','sara','female','أنثى'];
+
+function arabicVoices(){
+  if(!synth) return [];
+  return synth.getVoices().filter(v=>/^ar([-_]|$)/i.test(v.lang) || /arab|عرب/i.test(v.name));
+}
+
+function voiceScore(v){
+  const n = v.name.toLowerCase();
+  let s = 0;
+  if(/female/.test(n) || FEMALE_HINTS.some(h=>n.includes(h))) s -= 10;
+  else if(MALE_HINTS.some(h=>n.includes(h))) s += 10;
+  if(/^ar[-_]ae/i.test(v.lang)) s += 3;       // Emirati Arabic first
+  else if(/^ar[-_]sa/i.test(v.lang)) s += 2;
+  else if(/^ar[-_]eg/i.test(v.lang)) s += 1;
+  if(/natural|online/.test(n)) s += 2;         // neural voices sound clearer
+  return s;
+}
+
+function pickVoice(){
+  const list = arabicVoices();
+  if(!list.length) return null;
+  return list.slice().sort((a,b)=>voiceScore(b)-voiceScore(a))[0];
+}
+
+function testAudio(){
+  speak('مرحباً، هذا اختبار للصوت. قاموس درس في البيت.');
+}
+
+function resetPlaying(){
+  if(currentPlaying){
+    currentPlaying.classList.remove('playing','playing-anim');
+    const btn = currentPlaying.querySelector('.audio-btn');
+    if(btn) btn.classList.remove('playing-anim');
+    currentPlaying = null;
+  }
+}
+
+function speak(text, cardEl){
+  if(!synth || typeof SpeechSynthesisUtterance === 'undefined'){
+    alert('هذا المتصفح لا يدعم النطق الصوتي. جرّب Microsoft Edge أو Google Chrome.');
+    return;
+  }
+  synth.cancel();
+  resetPlaying();
+
+  const voice = pickVoice();
+  if(!voice && !noVoiceWarned && synth.getVoices().length){
+    noVoiceWarned = true;
+    alert('لا يوجد صوت عربي على هذا الجهاز.\nجرّب متصفح Microsoft Edge، أو أضف حزمة الصوت العربي من إعدادات الجهاز.');
+  }
+
+  const utt = new SpeechSynthesisUtterance(text);
+  utt.lang = voice ? voice.lang : 'ar-SA';
+  utt.rate = 0.82;
+  utt.pitch = (voice && voiceScore(voice) >= 10) ? 1.05 : 1;   // male voice, slightly bright = young man
+  if(voice) utt.voice = voice;
+  currentUtt = utt;
+
+  const btn = cardEl ? cardEl.querySelector('.audio-btn') : null;
+  const done = ()=>{
+    if(cardEl) cardEl.classList.remove('playing');
+    if(btn) btn.classList.remove('playing-anim');
+    if(currentPlaying === cardEl) currentPlaying = null;
+  };
+  if(cardEl){
+    currentPlaying = cardEl;
+    cardEl.classList.add('playing');
+    if(btn) btn.classList.add('playing-anim');
+    utt.onend = done;
+  }
+  utt.onerror = done;
+
+  // speaking right after cancel() is silently dropped by Chrome/Edge, so wait a moment
+  setTimeout(()=>{ synth.resume(); synth.speak(utt); }, 80);
+}
+
+function playWord(id){
+  const w = WORDS.find(x=>x.id===id);
+  if(!w) return;
+  const card = document.getElementById('card-'+id);
+  speak(w.ar + '. ' + w.ex, card);
+}
+
+function buildFilters(){
+  const row = document.getElementById('filterRow');
+  row.innerHTML = Object.entries(CATS).map(([k,v])=>
+    `<button class="ftag${k===currentCat?' active':''}" onclick="setFilter('${k}')">${v.label}</button>`
+  ).join('');
+}
+
+function setFilter(cat){
+  currentCat = cat;
+  buildFilters();
+  renderCards();
+}
+
+function filterCards(){
+  renderCards();
+}
+
+function renderCards(){
+  const q = document.getElementById('searchInput').value.trim().toLowerCase();
+  const grid = document.getElementById('cardsGrid');
+  const filtered = WORDS.filter(w=>{
+    const matchCat = currentCat==='all' || w.cat===currentCat;
+    const matchQ = !q || w.ar.includes(q) || w.en.toLowerCase().includes(q) || w.ex.includes(q);
+    return matchCat && matchQ;
+  });
+
+  document.getElementById('countLabel').textContent = filtered.length + ' كلمة';
+
+  if(!filtered.length){
+    grid.innerHTML = '<div class="no-results">🔍 لا توجد نتائج للبحث</div>';
+    return;
+  }
+
+  // Group by category for section dividers
+  const groups = {};
+  filtered.forEach(w=>{
+    if(!groups[w.cat]) groups[w.cat]=[];
+    groups[w.cat].push(w);
+  });
+
+  const catOrder = ['verb','noun','prep','question','connect'];
+  const catNames = {
+    verb:'🟢 الأفعال — مَاذَا أَفْعَلُ؟',
+    noun:'🟡 أَسْمَاءُ الْبَيْتِ',
+    prep:'🟠 حُرُوفُ الْجَرِّ',
+    question:'🔵 أَدَوَاتُ الِاسْتِفْهَامِ',
+    connect:'🩷 أَدَوَاتُ الرَّبْطِ'
+  };
+
+  let html = '';
+  (currentCat==='all' ? catOrder : [currentCat]).forEach(cat=>{
+    const ws = groups[cat];
+    if(!ws || !ws.length) return;
+    const cls = CATS[cat]?.cls || '';
+    if(currentCat==='all'){
+      html += `<div class="section-divider"><span>${catNames[cat]||cat}</span></div>`;
+    }
+    ws.forEach(w=>{
+      html += `<div class="card ${cls}" id="card-${w.id}" onclick="playWord(${w.id})">
+        <div class="cat-badge cat-${w.cat}"></div>
+        <div class="card-icon">${w.icon}</div>
+        <div class="card-word">${w.ar}</div>
+        <span class="card-en">${w.en}</span>
+        <div class="card-ex">${w.ex}</div>
+        <button class="audio-btn" onclick="event.stopPropagation();playWord(${w.id})" aria-label="استمع">
+          <svg viewBox="0 0 24 24"><path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02z"/></svg>
+        </button>
+      </div>`;
+    });
+  });
+
+  grid.innerHTML = html;
+}
+
+// Init voices
+if(window.speechSynthesis){
+  synth.getVoices();
+  if(synth.onvoiceschanged !== undefined){
+    synth.onvoiceschanged = ()=>{ synth.getVoices(); };
+  }
+}
+
+buildFilters();
+renderCards();
+</script>
+</body>
+</html>
